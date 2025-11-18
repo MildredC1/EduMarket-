@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import pool from './config/db.js';
+import pool from './src/config/db.js';
 
 dotenv.config();
 

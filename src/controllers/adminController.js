@@ -74,3 +74,20 @@ export async function cambiarEstadoCurso(req, res) {
     res.status(500).json({ error: 'Error al cambiar estado del curso' });
   }
 }
+
+// Listar todos los cursos (solo admin)
+export async function listarCursosAdmin(req, res) {
+  try {
+    const [cursos] = await pool.promise().query(`
+      SELECT c.id, c.titulo, c.descripcion, c.precio, c.nivel, c.habilitado,
+             u.nombre AS instructor_nombre, u.apellido AS instructor_apellido
+      FROM cursos c
+      JOIN usuarios u ON u.id = c.instructor_id
+    `);
+
+    res.json(cursos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener cursos (admin)' });
+  }
+}

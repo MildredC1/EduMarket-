@@ -31,6 +31,10 @@ export async function crearCurso(req, res) {
 
   const { usuario, rol } = req.cookies;
 
+  if (!titulo || !descripcion || !imagen_principal || !precio || !nivel) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios' });
+  }
+
   if (rol !== 'instructor') {
     return res.status(403).json({ error: 'Solo instructores pueden crear cursos' });
   }

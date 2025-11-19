@@ -15,6 +15,13 @@ export function soloEstudiante(req, res, next) {
   }
   next();
 }
+export function soloAdminOInstructor(req, res, next) {
+  const rol = req.cookies.rol;
+  if (rol === 'admin' || rol === 'instructor') {
+    return next();
+  }
+  return res.status(403).json({ error: 'Acceso denegado: requiere rol admin o instructor' });
+}
 
 
 // Solo instructores

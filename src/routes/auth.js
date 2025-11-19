@@ -4,7 +4,7 @@ import { registrarse, iniciarSesion } from '../controllers/authController.js';
 const router = express.Router();
 
 // Registro
-router.post('/registro',registrarse);
+router.post('/registrarse',registrarse);
 
 // Login
 router.post('/login', iniciarSesion);

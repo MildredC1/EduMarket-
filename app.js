@@ -38,6 +38,7 @@ app.use('/categorias', categoriasRoutes); // Listado y asignación de categoría
 
 app.use('/', inscripcionesRoutes);
 app.use('/', catalogoRoutes);
+app.use('/', cursosRoutes);
 
 //  Ruta de prueba: listar usuarios directamente desde MySQL
 app.get('/usuarios', async (req, res) => {
@@ -52,7 +53,7 @@ app.get('/usuarios', async (req, res) => {
 
 //  Ruta de prueba: estado del servidor
 app.get('/', (req, res) => {
-  res.send('API de Cursos_Online funcionando correctamente 🚀');
+  res.send('API de Cursos_Online funcionando correctamente ');
 });
 
 //  Ruta 404 en formato JSON

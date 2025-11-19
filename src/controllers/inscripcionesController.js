@@ -10,6 +10,15 @@ export async function inscribirseEnCurso(req, res) {
   }
 
   try {
+    // Validar que el curso existe y está habilitado
+    const [curso] = await pool.promise().query(
+      'SELECT id FROM cursos WHERE id = ? AND habilitado = 1',
+      [id]
+    );
+    if (curso.length === 0) {
+      return res.status(404).json({ error: 'El curso no existe o está deshabilitado' });
+    }
+    
     // Evitar inscripción duplicada
     const [existe] = await pool.promise().query(
       'SELECT id FROM inscripciones WHERE usuario_id = ? AND curso_id = ?',

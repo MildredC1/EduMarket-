@@ -16,7 +16,7 @@ import catalogoRoutes from './src/routes/catalogo.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3500;
 const HOST = process.env.DB_HOST || 'localhost';
 
 //  Middlewares globales
@@ -38,7 +38,7 @@ app.use('/categorias', categoriasRoutes); // Listado y asignación de categoría
 
 app.use('/', inscripcionesRoutes);
 app.use('/', catalogoRoutes);
-app.use('/', cursosRoutes);
+
 
 //  Ruta de prueba: listar usuarios directamente desde MySQL
 app.get('/usuarios', async (req, res) => {

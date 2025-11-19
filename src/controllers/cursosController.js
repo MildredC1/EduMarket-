@@ -18,3 +18,88 @@ export async function listarCursos(req, res) {
   }
 }
 
+//  Crear curso (solo instructores)
+export async function crearCurso(req, res) {
+  const {
+    titulo,
+    descripcion,
+    imagen_principal,
+    imagenes_secundarias,
+    precio,
+    nivel
+  } = req.body;
+
+  const { usuario, rol } = req.cookies;
+
+  if (rol !== 'instructor') {
+    return res.status(403).json({ error: 'Solo instructores pueden crear cursos' });
+  }
+
+  try {
+    await pool.promise().query(
+      `INSERT INTO cursos (titulo, descripcion, imagen_principal, imagenes_secundarias, precio, nivel, instructor_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        titulo,
+        descripcion,
+        imagen_principal,
+        JSON.stringify(imagenes_secundarias || []),
+        precio,
+        nivel,
+        usuario // aquí debe ser el id del instructor guardado en la cookie/session
+      ]
+    );
+    res.status(201).json({ mensaje: 'Curso creado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al crear curso' });
+  }
+}
+
+//  Actualizar curso (solo instructores)
+export async function actualizarCurso(req, res) {
+  const { id } = req.params;
+  const {
+    titulo,
+    descripcion,
+    imagen_principal,
+    imagenes_secundarias,
+    precio,
+    nivel,
+    habilitado
+  } = req.body;
+
+  const { usuario, rol } = req.cookies;
+
+  if (rol !== 'instructor') {
+    return res.status(403).json({ error: 'Solo instructores pueden actualizar cursos' });
+  }
+
+  try {
+    const [resultado] = await pool.promise().query(
+      `UPDATE cursos
+       SET titulo = ?, descripcion = ?, imagen_principal = ?, imagenes_secundarias = ?, precio = ?, nivel = ?, habilitado = ?
+       WHERE id = ? AND instructor_id = ?`,
+      [
+        titulo,
+        descripcion,
+        imagen_principal,
+        JSON.stringify(imagenes_secundarias || []),
+        precio,
+        nivel,
+        habilitado,
+        id,
+        usuario // validamos que el curso pertenezca al instructor logueado
+      ]
+    );
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({ error: 'Curso no encontrado o no autorizado' });
+    }
+
+    res.json({ mensaje: 'Curso actualizado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al actualizar curso' });
+  }
+}

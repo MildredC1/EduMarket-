@@ -17,6 +17,39 @@ export async function listarCursos(req, res) {
     res.status(500).json({ error: 'Error al obtener cursos' });
   }
 }
+export async function verDetalleCurso(req, res) {
+  const { id } = req.params;
+
+  try {
+    const [[curso]] = await pool.promise().query(`
+      SELECT c.id, c.titulo, c.descripcion, c.precio, c.nivel,
+             c.imagen_principal, c.imagenes_secundarias, c.enlace_youtube,
+             u.nombre AS instructor_nombre, u.apellido AS instructor_apellido
+      FROM cursos c
+      JOIN usuarios u ON u.id = c.instructor_id
+      WHERE c.id = ? AND c.habilitado = 1
+    `, [id]);
+
+    if (!curso) {
+      return res.status(404).json({ error: 'Curso no encontrado o no habilitado' });
+    }
+
+    const [[{ promedio }]] = await pool.promise().query(`
+      SELECT ROUND(AVG(puntuacion), 1) AS promedio
+      FROM valoraciones
+      WHERE curso_id = ?
+    `, [id]);
+
+    curso.rating_promedio = promedio || 0;
+    curso.imagenes_secundarias = JSON.parse(curso.imagenes_secundarias || '[]');
+
+    res.json(curso);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener detalle del curso' });
+  }
+}
+
 
 //  Crear curso (solo instructores)
 export async function crearCurso(req, res) {
@@ -26,10 +59,11 @@ export async function crearCurso(req, res) {
     imagen_principal,
     imagenes_secundarias,
     precio,
-    nivel
+    nivel,
+    enlace_youtube
   } = req.body;
 
-  const { usuario, rol } = req.cookies;
+  const { usuario:instructor_id, rol } = req.cookies;
 
   if (!titulo || !descripcion || !imagen_principal || !precio || !nivel) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
@@ -41,8 +75,8 @@ export async function crearCurso(req, res) {
 
   try {
     await pool.promise().query(
-      `INSERT INTO cursos (titulo, descripcion, imagen_principal, imagenes_secundarias, precio, nivel, instructor_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO cursos (titulo, descripcion, imagen_principal, imagenes_secundarias, precio, nivel,enlace_youtube, instructor_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
       [
         titulo,
         descripcion,
@@ -50,7 +84,9 @@ export async function crearCurso(req, res) {
         JSON.stringify(imagenes_secundarias || []),
         precio,
         nivel,
-        usuario // aquí debe ser el id del instructor guardado en la cookie/session
+        enlace_youtube,
+        instructor_id
+        
       ]
     );
     res.status(201).json({ mensaje: 'Curso creado correctamente' });
@@ -70,10 +106,11 @@ export async function actualizarCurso(req, res) {
     imagenes_secundarias,
     precio,
     nivel,
-    habilitado
+    habilitado,
+    enlace_youtube
   } = req.body;
 
-  const { usuario, rol } = req.cookies;
+  const { usuario:instructor_id, rol } = req.cookies;
 
   if (rol !== 'instructor') {
     return res.status(403).json({ error: 'Solo instructores pueden actualizar cursos' });
@@ -82,7 +119,7 @@ export async function actualizarCurso(req, res) {
   try {
     const [resultado] = await pool.promise().query(
       `UPDATE cursos
-       SET titulo = ?, descripcion = ?, imagen_principal = ?, imagenes_secundarias = ?, precio = ?, nivel = ?, habilitado = ?
+       SET titulo = ?, descripcion = ?, imagen_principal = ?, imagenes_secundarias = ?, precio = ?, nivel = ?, habilitado = ?, enlace_youtube = ?
        WHERE id = ? AND instructor_id = ?`,
       [
         titulo,
@@ -92,8 +129,9 @@ export async function actualizarCurso(req, res) {
         precio,
         nivel,
         habilitado,
+        enlace_youtube,
         id,
-        usuario // validamos que el curso pertenezca al instructor logueado
+        instructor_id // validamos que el curso pertenezca al instructor logueado
       ]
     );
 

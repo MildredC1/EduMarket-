@@ -20,7 +20,7 @@ export async function registrarse(req, res) {
   const hash = await bcrypt.hash(contrasena, 10);
   await pool.promise().query(
     'INSERT INTO usuarios (nombre, apellido, correo, contrasena_hash, rol) VALUES (?, ?, ?, ?, ?)',
-    [nombre, apellido, correo, hash, 'estudiante']
+    [nombre, apellido, correo, hash, 'instructor']
   );
 
   res.status(201).json({ mensaje: 'Usuario registrado con éxito' });

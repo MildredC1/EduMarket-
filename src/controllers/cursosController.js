@@ -107,3 +107,17 @@ export async function actualizarCurso(req, res) {
     res.status(500).json({ error: 'Error al actualizar curso' });
   }
 }
+// Listar cursos creados por el instructor logueado
+export async function listarCursosInstructor(req, res) {
+  const instructorId = req.cookies.usuario; // id del instructor guardado en cookie/session
+  try {
+    const [cursos] = await pool.promise().query(
+      'SELECT * FROM cursos WHERE instructor_id = ?',
+      [instructorId]
+    );
+    res.json(cursos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener cursos del instructor' });
+  }
+}

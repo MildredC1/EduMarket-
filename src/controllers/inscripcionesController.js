@@ -3,17 +3,28 @@ import pool from '../config/db.js';
 // Inscribir estudiante en un curso
 export async function inscribirseEnCurso(req, res) {
   const { id } = req.params; // id del curso
-  const { usuario, rol } = req.cookies; // id del usuario en cookie
+  const { usuario, rol } = req.cookies;
 
   if (rol !== 'estudiante') {
     return res.status(403).json({ error: 'Solo estudiantes pueden inscribirse en cursos' });
   }
 
   try {
+    // Evitar inscripción duplicada
+    const [existe] = await pool.promise().query(
+      'SELECT id FROM inscripciones WHERE usuario_id = ? AND curso_id = ?',
+      [usuario, id]
+    );
+    if (existe.length > 0) {
+      return res.status(400).json({ error: 'Ya estás inscrito en este curso' });
+    }
+
+    // Insertar inscripción
     await pool.promise().query(
       'INSERT INTO inscripciones (usuario_id, curso_id) VALUES (?, ?)',
       [usuario, id]
     );
+
     res.status(201).json({ mensaje: 'Inscripción realizada con éxito' });
   } catch (error) {
     console.error(error);

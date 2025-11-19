@@ -1,6 +1,6 @@
 import express from 'express';
 import { verificarSesion } from '../middlewares/sesion.js';
-import { soloAdmin } from '../middlewares/roles.js';
+import { soloAdmin, soloInstructor,soloAdminOInstructor } from '../middlewares/roles.js';
 import {
   listarCategorias,
   crearCategoria,
@@ -13,9 +13,9 @@ const router = express.Router();
 router.get('/', listarCategorias);
 
 // Crear categoría (solo admin)
-router.post('/', verificarSesion, soloAdmin, crearCategoria);
+router.post('/', verificarSesion, soloAdminOInstructor, crearCategoria);
 
 // Asignar categoría a curso (solo admin)
-router.post('/asignar', verificarSesion, soloAdmin, asignarCategoriaACurso);
+router.post('/asignar', verificarSesion, soloAdminOInstructor, asignarCategoriaACurso);
 
 export default router;

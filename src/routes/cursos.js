@@ -1,5 +1,5 @@
 import express from 'express';
-import { listarCursos, crearCurso, actualizarCurso } from '../controllers/cursosController.js';
+import { listarCursos, crearCurso, actualizarCurso,listarCursosInstructor } from '../controllers/cursosController.js';
 import { verificarSesion } from '../middlewares/sesion.js';
 import { soloInstructor } from '../middlewares/roles.js';
 
@@ -13,5 +13,8 @@ router.post('/', verificarSesion, soloInstructor, crearCurso);
 
 // Actualizar curso (solo instructores con sesión)
 router.put('/:id', verificarSesion, soloInstructor, actualizarCurso);
+
+// Ver cursos creados por el instructor logueado
+router.get('/mis-cursos', verificarSesion, soloInstructor, listarCursosInstructor);
 
 export default router;

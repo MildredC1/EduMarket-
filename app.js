@@ -10,6 +10,7 @@ import authRoutes from './src/routes/auth.js';
 import cursosRoutes from './src/routes/cursos.js';
 import adminRoutes from './src/routes/admin.js';
 import categoriasRoutes from './src/routes/categorias.js';
+import inscripcionesRoutes from './src/routes/inscripciones.js';
 
 dotenv.config();
 
@@ -33,6 +34,8 @@ app.use('/auth', authRoutes);         // Registro, login, logout
 app.use('/cursos', cursosRoutes);     // Listado, creación y edición de cursos
 app.use('/admin', adminRoutes);       // Gestión de usuarios y cursos (solo admin)
 app.use('/categorias', categoriasRoutes); // Listado y asignación de categorías
+
+app.use('/', inscripcionesRoutes);
 
 //  Ruta de prueba: listar usuarios directamente desde MySQL
 app.get('/usuarios', async (req, res) => {

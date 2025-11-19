@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
+
 
 export async function registrarse(req, res) {
   const { nombre, apellido, correo, contrasena } = req.body;
@@ -38,7 +39,7 @@ export async function iniciarSesion(req, res) {
   if (!valido) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
   
-  res.cookie('usuario', usuario.nombre, { httpOnly: true, maxAge: 3600000 });
+  res.cookie('usuario', usuario.id, { httpOnly: true, maxAge: 3600000 });
   res.cookie('rol', usuario.rol, { httpOnly: true, maxAge: 3600000 });
 
   res.json({ mensaje: 'Login exitoso', usuario: { id: usuario.id, nombre: usuario.nombre, rol: usuario.rol } });

@@ -27,20 +27,37 @@ export async function registrarse(req, res) {
 }
 
 export async function iniciarSesion(req, res) {
-  const { correo, contrasena } = req.body;
+  try {
+    const { correo, contrasena } = req.body;
 
-  const [[usuario]] = await pool.promise().query(
-    'SELECT * FROM usuarios WHERE correo = ?',
-    [correo]
-  );
-  if (!usuario) return res.status(401).json({ error: 'Usuario no encontrado' });
+    const [[usuario]] = await pool.promise().query(
+      'SELECT * FROM usuarios WHERE correo = ?',
+      [correo]
+    );
 
-  const valido = await bcrypt.compare(contrasena, usuario.contrasena_hash);
-  if (!valido) return res.status(401).json({ error: 'Contraseña incorrecta' });
+    if (!usuario) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
 
-  
-  res.cookie('usuario', usuario.id, { httpOnly: true, maxAge: 3600000 });
-  res.cookie('rol', usuario.rol, { httpOnly: true, maxAge: 3600000 });
+    const valido = await bcrypt.compare(contrasena, usuario.contrasena_hash);
+    if (!valido) {
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
+    }
 
-  res.json({ mensaje: 'Login exitoso', usuario: { id: usuario.id, nombre: usuario.nombre, rol: usuario.rol } });
+    res.cookie('usuario', usuario.id, { httpOnly: true, maxAge: 3600000 });
+    res.cookie('rol', usuario.rol, { httpOnly: true, maxAge: 3600000 });
+
+    res.json({
+      mensaje: 'Login exitoso',
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        rol: usuario.rol,
+        correo: usuario.correo
+      }
+    });
+  } catch (error) {
+    console.error('Error en iniciarSesion:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 }

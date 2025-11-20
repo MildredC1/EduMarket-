@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Cursos from './pages/Cursos.jsx';
+import Login from './pages/Login.jsx';
+
 
 export default function App() {
   return (
@@ -11,6 +13,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/cursos" element={<Cursos />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );

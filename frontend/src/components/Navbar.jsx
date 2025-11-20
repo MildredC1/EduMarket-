@@ -5,6 +5,7 @@ export default function Navbar() {
     <nav style={{ padding: '10px', background: '#eee' }}>
       <Link to="/" style={{ marginRight: '10px' }}>Inicio</Link>
       <Link to="/cursos">Cursos</Link>
+      <Link to="/login">Login</Link> 
     </nav>
   );
 }

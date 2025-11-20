@@ -23,10 +23,8 @@ export default function Login() {
         body: JSON.stringify({ correo, contrasena }),
         credentials: 'include' // importante para que se guarden las cookies
       });
-      const text = await res.text();
-      if (!text) throw new Error('Respuesta vacía del servidor');
-
-      const data = JSON.parse(text);
+      const data = await res.json();
+      
 
       if (!res.ok) {
         throw new Error(data.error || 'Error en el inicio de sesión');

@@ -31,13 +31,13 @@ app.use((req, res, next) => {
 });
 
 //  Rutas principales
-app.use('/auth', authRoutes);         // Registro, login, logout
-app.use('/cursos', cursosRoutes);     // Listado, creación y edición de cursos
-app.use('/admin', adminRoutes);       // Gestión de usuarios y cursos (solo admin)
-app.use('/categorias', categoriasRoutes); // Listado y asignación de categorías
+app.use('/api/auth', authRoutes);         // Registro, login, logout
+app.use('/api/cursos', cursosRoutes);     // Listado, creación y edición de cursos
+app.use('/api/admin', adminRoutes);       // Gestión de usuarios y cursos (solo admin)
+app.use('/api/categorias', categoriasRoutes); // Listado y asignación de categorías
 
-app.use('/', inscripcionesRoutes);
-app.use('/', catalogoRoutes);
+app.use('/api/inscripciones', inscripcionesRoutes);
+app.use('/api/catalogo', catalogoRoutes);
 
 
 //  Ruta de prueba: listar usuarios directamente desde MySQL

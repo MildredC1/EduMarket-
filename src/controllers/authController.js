@@ -18,13 +18,27 @@ export async function registrarse(req, res) {
   }
 
   const hash = await bcrypt.hash(contrasena, 10);
-  await pool.promise().query(
+  const [resultado] = await pool.promise().query(
     'INSERT INTO usuarios (nombre, apellido, correo, contrasena_hash, rol) VALUES (?, ?, ?, ?, ?)',
     [nombre, apellido, correo, hash, 'instructor']
   );
 
-  res.status(201).json({ mensaje: 'Usuario registrado con éxito' });
+  // Obtener el usuario recién creado
+  const [[usuario]] = await pool.promise().query(
+    'SELECT id, nombre, apellido, correo, rol FROM usuarios WHERE id = ?',
+    [resultado.insertId]
+  );
+
+  // Guardar cookies 
+  res.cookie('usuario', usuario.id, { httpOnly: true, maxAge: 3600000 });
+  res.cookie('rol', usuario.rol, { httpOnly: true, maxAge: 3600000 });
+
+  res.status(201).json({
+    mensaje: 'Usuario registrado con éxito',
+    usuario
+  });
 }
+
 
 export async function iniciarSesion(req, res) {
   try {
@@ -58,6 +72,16 @@ export async function iniciarSesion(req, res) {
     });
   } catch (error) {
     console.error('Error en iniciarSesion:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+}
+export async function cerrarSesion(req, res) {
+  try {
+    res.clearCookie('usuario');
+    res.clearCookie('rol');
+    res.json({ mensaje: 'Logout exitoso' });
+  } catch (error) {
+    console.error('Error en cerrarSesion:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }

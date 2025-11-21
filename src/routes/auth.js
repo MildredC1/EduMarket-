@@ -1,5 +1,5 @@
 import express from 'express';
-import { registrarse, iniciarSesion } from '../controllers/authController.js';
+import { registrarse, iniciarSesion,cerrarSesion } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -10,10 +10,6 @@ router.post('/registrarse',registrarse);
 router.post('/login', iniciarSesion);
 
 // Logout
-router.post('/logout', (req, res) => {
-  res.clearCookie('usuario');
-  res.clearCookie('rol');
-  res.json({ mensaje: 'Sesión cerrada correctamente' });
-});
+router.post('/logout', cerrarSesion);
 
 export default router;

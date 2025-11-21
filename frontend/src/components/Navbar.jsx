@@ -11,6 +11,11 @@ export default function Navbar() {
       <Link to="/cursos">Cursos</Link>
       <Link to="/login">Login</Link> 
 
+      {/* 👇 Mostrar solo a instructores o admin */}
+      {user && (user.rol === 'instructor' || user.rol === 'admin') && (
+        <Link to="/crear-curso">Crear Curso</Link>
+      )}
+
       {user ? (
         <span style={{ marginLeft: 'auto' }}>
           Bienvenido <strong>{user.nombre}</strong> ({user.rol})

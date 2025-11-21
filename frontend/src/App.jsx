@@ -5,6 +5,7 @@ import Inicio from './pages/Inicio.jsx';
 import Cursos from './pages/Cursos.jsx';
 import Registro from './pages/Registro.jsx';
 import Login from './pages/Login.jsx';
+import CrearCurso from './pages/CrearCurso';
 
 
 
@@ -14,9 +15,10 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Inicio />} />
-        <Route path="/cursos" element={<Cursos />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/cursos" element={<Cursos />} />
+        <Route path="/crear-curso" element={<CrearCurso />} />
       </Routes>
     </BrowserRouter>
   );

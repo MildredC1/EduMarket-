@@ -16,6 +16,11 @@ export default function Navbar() {
         <Link to="/crear-curso">Crear Curso</Link>
       )}
 
+      {/* 👇 Mostrar solo a estudiantes */}
+      {user && user.rol === 'estudiante' && (
+        <Link to="/mis-cursos">Mis Cursos</Link>
+      )}
+
       {user ? (
         <span style={{ marginLeft: 'auto' }}>
           Bienvenido <strong>{user.nombre}</strong> ({user.rol})

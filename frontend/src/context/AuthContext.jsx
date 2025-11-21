@@ -4,11 +4,11 @@ import { AuthContext } from './auth.hook.js';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  const login = (correo, rol) => setUser({ correo, rol });
+  const login = (correo, rol,nombre) => setUser({ correo, rol,nombre });
 
   const logout = () => {
     setUser(null);
-    fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
   };
 
   return (

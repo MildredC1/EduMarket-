@@ -21,7 +21,7 @@ export default function Login() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo, contrasena }),
-        credentials: 'include' // importante para que se guarden las cookies
+        credentials: 'include' // las cookies
       });
       const data = await res.json();
       
@@ -31,7 +31,7 @@ export default function Login() {
       }
 
       // Guardar usuario en contexto
-      login(data.usuario.correo, data.usuario.rol);
+      login(data.usuario.correo, data.usuario.rol, data.usuario.nombre);
 
       setMensaje(data.mensaje);
       navigate('/'); // redirige al inicio

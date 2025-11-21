@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/auth.hook';
 
 export default function CrearCurso() {
-  const { user } = useAuth(); // aquí tienes el usuario logueado
+  const { user } = useAuth(); 
   const [categorias, setCategorias] = useState([]);
   const [form, setForm] = useState({
     titulo: '',
@@ -17,7 +17,6 @@ export default function CrearCurso() {
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
-  // 🔹 Cargar categorías desde el backend
   useEffect(() => {
     fetch('/api/categorias')
       .then(res => res.json())
@@ -25,18 +24,10 @@ export default function CrearCurso() {
       .catch(err => console.error('Error al cargar categorías:', err));
   }, []);
 
-  // 🔹 Manejar cambios en inputs
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔹 Manejar selección múltiple de categorías
-  const handleCategoriasChange = e => {
-    const values = Array.from(e.target.selectedOptions, option => option.value);
-    setForm({ ...form, categorias: values });
-  };
-
-  // 🔹 Enviar formulario al backend
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
@@ -73,19 +64,86 @@ export default function CrearCurso() {
     <div style={{ maxWidth: '600px', margin: 'auto' }}>
       <h2>Crear Curso</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="titulo" placeholder="Título" value={form.titulo} onChange={handleChange} required />
-        <textarea name="descripcion" placeholder="Descripción" value={form.descripcion} onChange={handleChange} required />
-        <input type="text" name="imagen_principal" placeholder="URL imagen principal" value={form.imagen_principal} onChange={handleChange} required />
-        <input type="number" name="precio" placeholder="Precio" value={form.precio} onChange={handleChange} required />
-        <input type="text" name="nivel" placeholder="Nivel (básico, intermedio, avanzado)" value={form.nivel} onChange={handleChange} required />
-        <input type="text" name="enlace_youtube" placeholder="Enlace YouTube" value={form.enlace_youtube} onChange={handleChange} />
+        {/* 🔹 Título */}
+        <input 
+          type="text" 
+          name="titulo" 
+          placeholder="Título" 
+          value={form.titulo} 
+          onChange={handleChange} 
+          required 
+        />
 
-        <label>Categorías:</label>
-        <select name="categorias" multiple value={form.categorias} onChange={handleCategoriasChange} required>
+        {/* 🔹 Categorías justo después del título */}
+        <label style={{ display: 'block', marginTop: '10px' }}>Categorías:</label>
+        <div style={{ marginBottom: '15px' }}>
           {categorias.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+            <label key={cat.id} style={{ display: 'inline-block', marginRight: '10px' }}>
+              <input
+                type="checkbox"
+                value={cat.id}
+                checked={form.categorias.includes(String(cat.id))}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setForm({ ...form, categorias: [...form.categorias, String(cat.id)] });
+                  } else {
+                    setForm({ ...form, categorias: form.categorias.filter(c => c !== String(cat.id)) });
+                  }
+                }}
+              />
+              {cat.nombre}
+            </label>
           ))}
-        </select>
+        </div>
+
+        {/* 🔹 Descripción */}
+        <textarea 
+          name="descripcion" 
+          placeholder="Descripción" 
+          value={form.descripcion} 
+          onChange={handleChange} 
+          required 
+        />
+
+        {/* 🔹 Precio */}
+        <input 
+          type="number" 
+          name="precio" 
+          placeholder="Precio" 
+          value={form.precio} 
+          onChange={handleChange} 
+          required 
+          step="1" 
+        />
+
+        {/* 🔹 Nivel */}
+        <input 
+          type="text" 
+          name="nivel" 
+          placeholder="Nivel (básico, intermedio, avanzado)" 
+          value={form.nivel} 
+          onChange={handleChange} 
+          required 
+        />
+
+        {/* 🔹 Imagen principal */}
+        <input 
+          type="text" 
+          name="imagen_principal" 
+          placeholder="URL imagen principal" 
+          value={form.imagen_principal} 
+          onChange={handleChange} 
+          required 
+        />
+
+        {/* 🔹 Enlace YouTube */}
+        <input 
+          type="text" 
+          name="enlace_youtube" 
+          placeholder="Enlace YouTube" 
+          value={form.enlace_youtube} 
+          onChange={handleChange} 
+        />
 
         <button type="submit">Crear curso</button>
       </form>

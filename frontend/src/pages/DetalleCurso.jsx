@@ -1,43 +1,106 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Asegúrate de importar useNavigate
+import { useAuth } from '../context/auth.hook'; //hook de autenticación para verificar la sesión
 
 export default function DetalleCurso() {
-  const { id } = useParams(); // id del curso desde la URL
+  
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { usuario } = useAuth(); // Para verificar si el usuario está logueado
+
+  console.log('Usuario de la sesión:', usuario);
   const [curso, setCurso] = useState(null);
-  const [mensaje, setMensaje] = useState('');
+  const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(true);
+  const [mensaje, setMensaje] = useState(''); // Estado para mensajes de inscripción
 
   useEffect(() => {
-    fetch(`/api/cursos/catalogo/cursos/${id}`)
-      .then(res => res.json())
-      .then(data => setCurso(data))
-      .catch(err => console.error(err));
+    // ... (Tu lógica de fetch existente para cargar el curso)
+    setCargando(true);
+    setError('');
+    
+    fetch(`/api/cursos/${id}`, { credentials: 'include' })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(data => { throw new Error(data.error || 'Error desconocido del servidor'); });
+        }
+        return res.json();
+      })
+      .then(data => {
+        setCurso(data);
+      })
+      .catch(err => {
+        setError(err.message);
+        setCurso(null);
+      })
+      .finally(() => {
+        setCargando(false);
+      });
   }, [id]);
 
+  // --- NUEVA LÓGICA DE INSCRIPCIÓN ---
   const inscribirse = async () => {
+    if (!usuario) {
+      setMensaje('Debes iniciar sesión para inscribirte en un curso.');
+      return;
+    }
+
+    setMensaje(''); // Limpiar mensajes
+    
     try {
+      // Usamos la ruta ya definida en cursos.js
       const res = await fetch(`/api/cursos/${id}/inscribirse`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
       });
+
       const data = await res.json();
-      setMensaje(data.mensaje || data.error);
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al procesar la inscripción.');
+      }
+
+      setMensaje(data.mensaje || '¡Inscripción exitosa!');
+      
+      // Opcional: Redirigir a Mis Cursos después de una inscripción exitosa
+      setTimeout(() => {
+         navigate('/mis-cursos');
+      }, 1500);
+
     } catch (err) {
-      setMensaje('Error al inscribirse');
+      setMensaje('Error: ' + err.message);
     }
   };
+  
+  // --- Lógica de Renderizado ---
+  
+  if (cargando) return <p>Cargando curso...</p>;
 
-  if (!curso) return <p>Cargando curso...</p>;
+  if (error) return <p style={{ color: 'red' }}>Error al cargar el curso: {error}</p>;
+
+  if (!curso || !curso.id) return <p>El curso con ID {id} no fue encontrado.</p>;
 
   return (
-    <div>
-      <h2>{curso.titulo}</h2>
-      <p>{curso.descripcion}</p>
-      <p>Precio: {curso.precio}</p>
-      <p>Instructor: {curso.instructor_nombre} {curso.instructor_apellido}</p>
+  <div style={{ maxWidth: '700px', margin: 'auto' }}>
+    <h2>{curso.titulo}</h2>
+    <p>{curso.descripcion}</p>
+    {/* ... otros detalles ... */}
 
+    
+    {usuario ? (
+      // SI el usuario EXISTE, solo mostramos el botón.
       <button onClick={inscribirse}>Inscribirme</button>
+    ) : (
+      // SI el usuario NO EXISTE, mostramos el mensaje de advertencia.
+      <p style={{ color: 'orange', fontWeight: 'bold' }}>
+        Debes iniciar sesión para inscribirte en un curso.
+      </p>
+    )}
+    
 
-      {mensaje && <p>{mensaje}</p>}
-    </div>
-  );
+    
+    {mensaje && <p style={{ color: mensaje.includes('Error') ? 'red' : 'green' }}>{mensaje}</p>}
+  </div>
+);
 }

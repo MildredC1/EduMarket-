@@ -23,11 +23,24 @@ export default function Login() {
         body: JSON.stringify({ correo, contrasena }),
         credentials: 'include' // las cookies
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        // Manejar el caso de una respuesta no-JSON (como una página de error 500 por defecto)
+        // Puedes lanzar un error genérico o verificar el estado de la respuesta aquí.
+        if (!res.ok) {
+           throw new Error(`Error en el servidor: Código ${res.status}`);
+        }
+        // Si res.ok es true, pero falló el JSON, es un problema inusual.
+        throw new Error('Respuesta inválida del servidor (No JSON)');
+      }
       
-
+      // Ahora, verificamos si la respuesta fue exitosa (res.ok es true para 200-299)
       if (!res.ok) {
-        throw new Error(data.error || 'Error en el inicio de sesión');
+        // Si res.ok es false, `data` debería contener el objeto de error del servidor.
+        // Si el servidor no devolvió un cuerpo con el error, el `data.error` podría ser undefined.
+        throw new Error(data.error || `Error en el inicio de sesión con estado ${res.status}`);
       }
 
       // Guardar usuario en contexto

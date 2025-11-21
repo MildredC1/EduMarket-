@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -23,7 +24,10 @@ export default function Cursos() {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <ul>
         {cursos.map(curso => (
-          <li key={curso.id}>{curso.titulo} - {curso.habilitado ? 'Activo' : 'Inactivo'}</li>
+          <li key={curso.id}>
+            {curso.titulo} - {curso.habilitado ? 'Activo' : 'Inactivo'}
+            <Link to={`/curso/${curso.id}`} style={{ marginLeft: '10px' }}>Ver detalle</Link>
+          </li>
         ))}
       </ul>
     </div>

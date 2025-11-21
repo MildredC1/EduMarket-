@@ -7,7 +7,7 @@ import Registro from './pages/Registro.jsx';
 import Login from './pages/Login.jsx';
 import CrearCurso from './pages/CrearCurso';
 import DetalleCurso from './pages/DetalleCurso';
-import MisCursos from './pages/MisCursos'; 
+import MisCursos from './pages/MisCursos.jsx';
 
 
 

@@ -9,34 +9,40 @@ export async function registrarse(req, res) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
-  const [existe] = await pool.promise().query(
-    'SELECT id FROM usuarios WHERE correo = ?',
-    [correo]
-  );
-  if (existe.length > 0) {
-    return res.status(400).json({ error: 'Correo ya registrado' });
+  try { 
+    const [existe] = await pool.promise().query(
+      'SELECT id FROM usuarios WHERE correo = ?',
+      [correo]
+    );
+    if (existe.length > 0) {
+      return res.status(400).json({ error: 'Correo ya registrado' });
+    }
+
+    const hash = await bcrypt.hash(contrasena, 10);
+    const [resultado] = await pool.promise().query(
+      'INSERT INTO usuarios (nombre, apellido, correo, contrasena_hash, rol) VALUES (?, ?, ?, ?, ?)',
+      [nombre, apellido, correo, hash, 'instructor']
+    );
+
+    // Obtener el usuario recién creado
+    const [[usuario]] = await pool.promise().query(
+      'SELECT id, nombre, apellido, correo, rol FROM usuarios WHERE id = ?',
+      [resultado.insertId]
+    );
+
+    // Guardar cookies 
+    res.cookie('usuario', usuario.id, { httpOnly: true, maxAge: 3600000 });
+    res.cookie('rol', usuario.rol, { httpOnly: true, maxAge: 3600000 });
+
+    res.status(201).json({
+      mensaje: 'Usuario registrado con éxito',
+      usuario
+    });
+  } catch (error) { 
+    console.error('Error en registrarse:', error);
+    
+    res.status(500).json({ error: 'Error interno del servidor en el registro' });
   }
-
-  const hash = await bcrypt.hash(contrasena, 10);
-  const [resultado] = await pool.promise().query(
-    'INSERT INTO usuarios (nombre, apellido, correo, contrasena_hash, rol) VALUES (?, ?, ?, ?, ?)',
-    [nombre, apellido, correo, hash, 'instructor']
-  );
-
-  // Obtener el usuario recién creado
-  const [[usuario]] = await pool.promise().query(
-    'SELECT id, nombre, apellido, correo, rol FROM usuarios WHERE id = ?',
-    [resultado.insertId]
-  );
-
-  // Guardar cookies 
-  res.cookie('usuario', usuario.id, { httpOnly: true, maxAge: 3600000 });
-  res.cookie('rol', usuario.rol, { httpOnly: true, maxAge: 3600000 });
-
-  res.status(201).json({
-    mensaje: 'Usuario registrado con éxito',
-    usuario
-  });
 }
 
 

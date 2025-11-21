@@ -256,3 +256,54 @@ export async function listarCursosInstructor(req, res) {
     res.status(500).json({ error: 'Error al obtener cursos' });
   }
 }
+
+export async function inscribirseCurso(req, res) {
+  const { id: cursoId } = req.params;
+  const { usuario: usuarioId, rol } = req.cookies;
+
+  if (rol !== 'estudiante') {
+    return res.status(403).json({ error: 'Solo estudiantes pueden inscribirse a cursos' });
+  }
+
+  try {
+    await pool.promise().query(
+      `INSERT INTO inscripciones (usuario_id, curso_id) VALUES (?, ?)`,
+      [usuarioId, cursoId]
+    );
+
+    res.json({ mensaje: 'Inscripción realizada correctamente' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'Ya estás inscrito en este curso' });
+    }
+    console.error(error);
+    res.status(500).json({ error: 'Error al inscribirse en el curso' });
+  }
+}
+
+
+export async function listarMisCursos(req, res) {
+  const { usuario: usuarioId, rol } = req.cookies;
+
+  if (rol !== 'estudiante') {
+    return res.status(403).json({ error: 'Solo estudiantes pueden ver sus cursos inscritos' });
+  }
+
+  try {
+    const [cursos] = await pool.promise().query(`
+      SELECT c.id, c.titulo, c.descripcion, c.precio, c.nivel,
+             GROUP_CONCAT(cat.nombre SEPARATOR ', ') AS categorias
+      FROM inscripciones i
+      JOIN cursos c ON i.curso_id = c.id
+      LEFT JOIN categoria_cursos cc ON c.id = cc.cursos_id
+      LEFT JOIN categorias cat ON cc.categoria_id = cat.id
+      WHERE i.usuario_id = ?
+      GROUP BY c.id
+    `, [usuarioId]);
+
+    res.json(cursos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener cursos inscritos' });
+  }
+}

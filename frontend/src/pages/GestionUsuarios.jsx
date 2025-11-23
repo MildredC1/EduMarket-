@@ -4,13 +4,13 @@ import { useAuth } from '../context/auth.hook';
 import { Card, CardBody, CardHeader } from '../components/Card';
 
 export default function GestionUsuarios() {
-  const { user } = useAuth();
+  const { usuario } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
 
   // Roles válidos que se pueden asignar
-  const rolesValidos = ['estudiante', 'instructor', 'soporte', 'admin'];
+  const rolesValidos = ['visitante', 'estudiante', 'instructor', 'soporte', 'admin'];
 
   // 1. Obtener la lista de usuarios (Solo admin)
   const cargarUsuarios = () => {
@@ -29,17 +29,17 @@ export default function GestionUsuarios() {
 
   useEffect(() => {
     // Solo intenta cargar si el usuario está logueado y es admin
-    if (user && user.rol === 'admin') {
+    if (usuario && usuario.rol === 'admin') {
       cargarUsuarios();
-    } else if (user) {
+    } else if (usuario) {
       setError('Acceso denegado. Solo administradores pueden gestionar usuarios.');
     }
-  }, [user]);
+  }, [usuario]);
 
   // 2. Cambiar el rol de un usuario
-  const cambiarRolUsuario = async (userId, nuevoRol) => {
+  const cambiarRolUsuario = async (usuarioId, nuevoRol) => {
     try {
-      const res = await fetch(`/api/admin/usuarios/${userId}/rol`, {
+      const res = await fetch(`/api/admin/usuarios/${usuarioId}/rol`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rol: nuevoRol }),
@@ -52,7 +52,7 @@ export default function GestionUsuarios() {
         throw new Error(data.error || 'Fallo al actualizar el rol.');
       }
 
-      setMensaje(`Rol de usuario ${userId} actualizado a ${nuevoRol}.`);
+      setMensaje(`Rol de usuario ${usuarioId} actualizado a ${nuevoRol}.`);
       cargarUsuarios(); // Recargar la lista
       
     } catch (err) {
@@ -60,7 +60,7 @@ export default function GestionUsuarios() {
     }
   };
 
-  if (!user || user.rol !== 'admin') {
+  if (!usuario || usuario.rol !== 'admin') {
     return <p style={{ color: 'red', textAlign: 'center' }}>Acceso restringido a administradores.</p>;
   }
 

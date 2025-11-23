@@ -42,7 +42,7 @@ export default function Registrarse() {
 
       // backend devuelve usuario, guardamos en contexto
       if (data.usuario) {
-        login(data.usuario.correo, data.usuario.rol,data.usuario.nombre);
+        login(data.usuario.id, data.usuario.rol, data.usuario.nombre);
       }
 
       navigate('/'); // directo al inicio

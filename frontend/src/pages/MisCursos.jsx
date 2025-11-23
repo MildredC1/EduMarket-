@@ -2,22 +2,22 @@ import { useState, useEffect } from 'react';
 
 export default function MisCursos() {
   const [cursos, setCursos] = useState([]);
-  const [error, setError] = useState(null); // Nuevo estado para manejar errores
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
-    // 1. Limpiar errores antes de la solicitud
+    
     setError(null); 
     
     fetch('/api/cursos/mis-cursos', { credentials: 'include' })
       .then(res => {
-        // 2. Manejo de errores: Si la respuesta no es OK, leer el error del body
+        
         if (!res.ok) {
            return res.json().then(data => { throw new Error(data.error || `Error del servidor: Código ${res.status}`); });
         }
         return res.json();
       })
       .then(data => {
-        // 3. Verificar que la data sea un array para evitar el TypeError
+        
         if (Array.isArray(data)) {
           setCursos(data);
         } else {
@@ -36,7 +36,7 @@ export default function MisCursos() {
       <h2>Mis Cursos</h2>
       {error && <p style={{ color: 'red' }}>Error al cargar los cursos: {error}</p>} {/* Mostrar mensaje de error */}
       
-      {/* Lógica para mostrar "No tienes cursos inscritos todavía." si no hay cursos Y NO hay error */}
+      { /*si no hay cursos Y NO hay error */}
       {cursos.length === 0 && !error ? (
         <p>No tienes cursos inscritos todavía.</p>
       ) : (

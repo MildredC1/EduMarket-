@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Asegúrate de importar useNavigate
-import { useAuth } from '../context/auth.hook'; //hook de autenticación para verificar la sesión
+import { useParams, useNavigate } from 'react-router-dom'; 
+import { useAuth } from '../context/auth.hook'; 
 
 export default function DetalleCurso() {
   
   const { id } = useParams();
   const navigate = useNavigate();
-  const { usuario } = useAuth(); // Para verificar si el usuario está logueado
+  const { usuario } = useAuth(); 
 
   console.log('Usuario de la sesión:', usuario);
   const [curso, setCurso] = useState(null);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(true);
-  const [mensaje, setMensaje] = useState(''); // Estado para mensajes de inscripción
+  const [mensaje, setMensaje] = useState(''); 
 
   useEffect(() => {
-    // ... (Tu lógica de fetch existente para cargar el curso)
+    
     setCargando(true);
     setError('');
     
@@ -38,7 +38,7 @@ export default function DetalleCurso() {
       });
   }, [id]);
 
-  // --- NUEVA LÓGICA DE INSCRIPCIÓN ---
+  
   const inscribirse = async () => {
     if (!usuario) {
       setMensaje('Debes iniciar sesión para inscribirte en un curso.');

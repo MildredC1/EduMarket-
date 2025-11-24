@@ -47,7 +47,7 @@ export default function EditarCurso() {
         .catch(() => console.error("Error al cargar categorías disponibles"));
 
     // Obtener la data del curso
-    const fetchCurso = fetch(`/api/cursos/${id}`, { credentials: 'include' })
+    const fetchCurso = fetch(`/api/cursos/${id}/gestion`, { credentials: 'include' })
       .then(res => {
         if (!res.ok) {
           return res.json().then(data => { throw new Error(data.error || 'Error al cargar curso'); });

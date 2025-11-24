@@ -138,9 +138,12 @@ export default function DetalleCurso() {
                         Editar Curso
                       </button>
                   </Link>
-                  <button onClick={eliminar} style={{ backgroundColor: 'red' }}>
-                     Eliminar Curso
-                  </button>
+                    {usuario.rol === 'admin' && (
+                      <button onClick={eliminar} style={{ backgroundColor: 'red' }}>
+                         Eliminar Curso
+                      </button>
+                   )}
+                 
                 </div>
             );
         }

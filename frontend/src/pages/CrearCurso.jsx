@@ -128,7 +128,7 @@ export default function CrearCurso() {
 
         {/* 🔹 Imagen principal */}
         <input 
-          type="text" 
+          type="url" 
           name="imagen_principal" 
           placeholder="URL imagen principal" 
           value={form.imagen_principal} 

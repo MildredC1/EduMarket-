@@ -74,7 +74,7 @@ export default function CrearCurso() {
           required 
         />
 
-        {/* 🔹 Categorías justo después del título */}
+        {/*  Categorías justo después del título */}
         <label style={{ display: 'block', marginTop: '10px' }}>Categorías:</label>
         <div style={{ marginBottom: '15px' }}>
           {categorias.map(cat => (

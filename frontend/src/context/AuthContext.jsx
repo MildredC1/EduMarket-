@@ -42,7 +42,12 @@ export function AuthProvider({ children }) {
     const logout = () => {
         setUsuario(null);
 
-        fetch('/api/logout', { method: 'POST', credentials: 'include' });
+        // Envía la solicitud al backend (que borra la cookie)
+        fetch('/api/logout', { method: 'POST', credentials: 'include' })
+            .finally(() => {
+                
+                window.location.href = '/';
+            });
     };
 
   
